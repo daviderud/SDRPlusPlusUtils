@@ -1,6 +1,8 @@
 import sqlite3
 from sqlite3 import Error
 import json
+from tkinter import filedialog
+
 
 
 def create_connection(db_file):
@@ -50,7 +52,23 @@ def select_all_entries(conn):
 
 
 def main():
-    database = r"d:\rud\OneDrive\0_mega_synch\documenti\lab casa\SDR\SDRSharp\Plugins\FMSuite\FMSuite.Databases\FMSuite.FMlistNL.db"
+    # from SDRPlusPlus/misc_modules/frequency_manager/src/main.cpp
+    dictionary_modes = {"NFM":0, "WFM":1, "AM":2, "DSB":3, "USB":4, "CW":5, "LSB":6, "RAW":7}
+
+    # Open the input file dialog
+    database = filedialog.askopenfilename(title="Select FMSuite database", filetypes=(("FMSuite database", "*.db"), ("all files", "*.*")))   
+    if database == "":
+        return
+    
+    # Open the output file dialog
+    output_json_filename = filedialog.asksaveasfilename(title="Enter JSON destination file", filetypes=(("JSON file", "*.json"), ("all files", "*.*")), initialfile=database)
+    if output_json_filename == "":
+        return
+    
+    # Append the extension if not already present
+    extension = ".json"  # Specify your desired extension here
+    if not output_json_filename.endswith(extension):
+        output_json_filename += extension
 
     # create a database connection
     conn = create_connection(database)
@@ -62,10 +80,30 @@ def main():
             print(title)
 
         # Save the row_data as a JSON file
-        with open('output.json', 'w') as json_file:
-            for entry in saved_entries:
-                json.dump(entry, json_file)
-                #print(entry)
+        with open(output_json_filename, 'w') as json_file:
+            
+            # format as per SDRPlusPlus import need
+            json_file.write('{"bookmarks": {')
+            
+            for i,entry in enumerate(saved_entries):
+                # put together entry and title in a dictionary
+                dictionary = dict(zip(titles, entry))
+                print(dictionary)
+
+                reformatted_dictionary = {dictionary['Description']: {"bandwidth": dictionary['Filter Bandwidth'],"frequency":dictionary['Frequency'],"mode":dictionary_modes[dictionary['Mode']]}}
+
+                token = json.dumps(reformatted_dictionary, indent=4)
+                
+                # clean the description name coming from some FMSuite exports
+                token = token.replace("\\ufffd", " ")
+
+                json_file.write(token[1:-1])
+
+                # seprate the entries with commas if not the last
+                if i != len(saved_entries) - 1:
+                    json_file.write(',')
+            
+            json_file.write('}\n}')
     
 
     conn.close()
