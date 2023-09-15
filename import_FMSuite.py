@@ -61,7 +61,7 @@ def main():
         return
     
     # Open the output file dialog
-    output_json_filename = filedialog.asksaveasfilename(title="Enter JSON destination file", filetypes=(("JSON file", "*.json"), ("all files", "*.*")), initialfile=database)
+    output_json_filename = filedialog.asksaveasfilename(title="Enter JSON destination file", filetypes=(("JSON file", "*.json"), ("all files", "*.*")), initialfile=database.rsplit(".", 1)[0])
     if output_json_filename == "":
         return
     
