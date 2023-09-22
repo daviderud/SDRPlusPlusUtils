@@ -145,7 +145,7 @@ def main():
                     json_file.write(',')
             
             json_file.write('}\n}')
-    
+            print(f"Translated {i} entries.")
 
     conn.close()
 
