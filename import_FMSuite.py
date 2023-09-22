@@ -90,7 +90,48 @@ def main():
                 dictionary = dict(zip(titles, entry))
                 print(dictionary)
 
-                reformatted_dictionary = {dictionary['Description']: {"bandwidth": dictionary['Filter Bandwidth'],"frequency":dictionary['Frequency'],"mode":dictionary_modes[dictionary['Mode']]}}
+                # format GEO info data
+                geo_string = ""
+                if dictionary['City'] != "":
+                    geo_string = geo_string + "Cty: " + dictionary['City'] + " "
+                
+                if dictionary['Country'] != "":
+                    geo_string = geo_string + "Cntr: " + dictionary['Country'] + " "
+                
+                if dictionary['Language'] != "":
+                    geo_string = geo_string + "Lng: " + dictionary['Language'] + " "
+
+                 # format time data
+                startTime = dictionary['StartTime']
+                if startTime.isdigit() and len(startTime) == 4:
+                    startTime_string = startTime
+                else:
+                    startTime_string = "0"
+
+                stopTime = dictionary['StopTime']
+                if stopTime.isdigit() and len(stopTime) == 4:
+                    stopTime_string = stopTime
+                else:
+                    stopTime_string = "0"
+
+                # format Day data
+
+                days = dictionary['Days']
+                digits = ["1", "2", "3", "4", "5", "6", "7"]
+                days_array = []
+
+                if days != "":
+                    for digit in digits:
+                        if digit in days:
+                            days_array.append("true")
+                        else:
+                            days_array.append("false")
+                else:
+                    for digit in digits:
+                        days_array.append("true")
+
+
+                reformatted_dictionary = {dictionary['Description']: {"bandwidth": dictionary['Filter Bandwidth'],"frequency":dictionary['Frequency'],"mode":dictionary_modes[dictionary['Mode']], "geo":geo_string, "startTime":startTime_string, "stopTime":stopTime_string, "days":days_array, "notes": dictionary['Notes']}}
 
                 token = json.dumps(reformatted_dictionary, indent=4)
                 
