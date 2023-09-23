@@ -50,6 +50,19 @@ def select_all_entries(conn):
     return column_names, rows
 
 
+def select_all_same_name(conn, name):
+    #TODO: rewrite more efficient with COUNT or so
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM Data WHERE Description = ?', [name])
+
+    rows = cur.fetchall()
+
+    #for row in rows:
+    #    print(row)
+
+    return rows
+
+
 
 def main():
     # from SDRPlusPlus/misc_modules/frequency_manager/src/main.cpp
@@ -58,11 +71,13 @@ def main():
     # Open the input file dialog
     database = filedialog.askopenfilename(title="Select FMSuite database", filetypes=(("FMSuite database", "*.db"), ("all files", "*.*")))   
     if database == "":
+        print("Cancelled.")
         return
     
     # Open the output file dialog
     output_json_filename = filedialog.asksaveasfilename(title="Enter JSON destination file", filetypes=(("JSON file", "*.json"), ("all files", "*.*")), initialfile=database.rsplit(".", 1)[0])
     if output_json_filename == "":
+        print("Cancelled.")
         return
     
     # Append the extension if not already present
@@ -79,6 +94,9 @@ def main():
         for title in titles:
             print(title)
 
+        total_num = len(saved_entries)
+        duplicated_num = 0
+
         # Save the row_data as a JSON file
         with open(output_json_filename, 'w') as json_file:
             
@@ -88,7 +106,7 @@ def main():
             for i,entry in enumerate(saved_entries):
                 # put together entry and title in a dictionary
                 dictionary = dict(zip(titles, entry))
-                print(dictionary)
+                #print(dictionary)
 
                 # format GEO info data
                 geo_string = ""
@@ -107,12 +125,14 @@ def main():
                     startTime_string = startTime
                 else:
                     startTime_string = "0"
+                startTime_num = int(startTime_string)
 
                 stopTime = dictionary['StopTime']
                 if stopTime.isdigit() and len(stopTime) == 4:
                     stopTime_string = stopTime
                 else:
                     stopTime_string = "0"
+                stopTime_num = int(stopTime_string)
 
                 # format Day data
 
@@ -123,15 +143,26 @@ def main():
                 if days != "":
                     for digit in digits:
                         if digit in days:
-                            days_array.append("true")
+                            days_array.append(True)
                         else:
-                            days_array.append("false")
+                            days_array.append(False)
                 else:
                     for digit in digits:
-                        days_array.append("true")
+                        days_array.append(True)
 
+                #if dictionary['Description'] == "Radio Delta International":
+                #    xxx = 3
 
-                reformatted_dictionary = {dictionary['Description']: {"bandwidth": dictionary['Filter Bandwidth'],"frequency":dictionary['Frequency'],"mode":dictionary_modes[dictionary['Mode']], "geo":geo_string, "startTime":startTime_string, "stopTime":stopTime_string, "days":days_array, "notes": dictionary['Notes']}}
+                # check if descritpion is duplicate. In that case, append the database ID to the name
+                description_to_check = dictionary['Description']
+                dupl_rows = select_all_same_name(conn, description_to_check)
+                if len(dupl_rows) > 1:
+                    description_string = dictionary['Description'] + "_" + str(dictionary['Id'])
+                    duplicated_num += 1
+                else:
+                    description_string = dictionary['Description']
+
+                reformatted_dictionary = {description_string: {"bandwidth": dictionary['Filter Bandwidth'],"frequency":dictionary['Frequency'],"mode":dictionary_modes[dictionary['Mode']], "geo":geo_string, "startTime":startTime_num, "stopTime":stopTime_num, "days":days_array, "notes": dictionary['Notes']}}
 
                 token = json.dumps(reformatted_dictionary, indent=4)
                 
@@ -144,8 +175,9 @@ def main():
                 if i != len(saved_entries) - 1:
                     json_file.write(',')
             
+                print(f"\rTranslated entry: {i}, progress: {int(i/total_num*100)}%...", end ='', flush=True)
             json_file.write('}\n}')
-            print(f"Translated {i} entries.")
+            print(f"\n\rTranslated {i+1} entries. {duplicated_num} entries were duplicated. File {output_json_filename}. Done.")
 
     conn.close()
 
