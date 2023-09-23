@@ -3,7 +3,7 @@ from sqlite3 import Error
 import json
 from tkinter import filedialog
 
-
+__version__ = "2.0"
 
 def create_connection(db_file):
     """ create a database connection to the SQLite database
