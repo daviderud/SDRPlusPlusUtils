@@ -110,26 +110,36 @@ def main():
 
                 # format GEO info data
                 geo_string = ""
-                if dictionary['City'] != "":
+
+                if dictionary['Power'] != "" and dictionary['Power'] is not None:
+                    geo_string = geo_string + "Pwr: " + str(dictionary['Power']) + " "
+
+                if dictionary['City'] != "" and dictionary['City'] is not None:
                     geo_string = geo_string + "Cty: " + dictionary['City'] + " "
                 
-                if dictionary['Country'] != "":
+                if dictionary['Country'] != "" and dictionary['Country'] is not None:
                     geo_string = geo_string + "Cntr: " + dictionary['Country'] + " "
                 
-                if dictionary['Language'] != "":
+                if dictionary['Language'] != "" and dictionary['Language'] is not None:
                     geo_string = geo_string + "Lng: " + dictionary['Language'] + " "
 
                  # format time data
                 startTime = dictionary['StartTime']
-                if startTime.isdigit() and len(startTime) == 4:
-                    startTime_string = startTime
+                if startTime is not None:
+                    if startTime.isdigit() and len(startTime) == 4:
+                        startTime_string = startTime
+                    else:
+                        startTime_string = "0"
                 else:
                     startTime_string = "0"
                 startTime_num = int(startTime_string)
 
                 stopTime = dictionary['StopTime']
-                if stopTime.isdigit() and len(stopTime) == 4:
-                    stopTime_string = stopTime
+                if stopTime is not None:
+                    if stopTime.isdigit() and len(stopTime) == 4 and stopTime is not None:
+                        stopTime_string = stopTime
+                    else:
+                        stopTime_string = "0"
                 else:
                     stopTime_string = "0"
                 stopTime_num = int(stopTime_string)
@@ -140,7 +150,7 @@ def main():
                 digits = ["1", "2", "3", "4", "5", "6", "7"]
                 days_array = []
 
-                if days != "":
+                if days != "" and days is not None:
                     for digit in digits:
                         if digit in days:
                             days_array.append(True)
@@ -162,7 +172,12 @@ def main():
                 else:
                     description_string = dictionary['Description']
 
-                reformatted_dictionary = {description_string: {"bandwidth": dictionary['Filter Bandwidth'],"frequency":dictionary['Frequency'],"mode":dictionary_modes[dictionary['Mode']], "geo":geo_string, "startTime":startTime_num, "stopTime":stopTime_num, "days":days_array, "notes": dictionary['Notes']}}
+                if dictionary['Notes'] != "" and dictionary['Notes'] is not None:
+                    notes_string = dictionary['Notes']
+                else:
+                    notes_string = ""
+
+                reformatted_dictionary = {description_string: {"bandwidth": dictionary['Filter Bandwidth'],"frequency":dictionary['Frequency'],"mode":dictionary_modes[dictionary['Mode']], "geoinfo":geo_string, "startTime":startTime_num, "stopTime":stopTime_num, "days":days_array, "notes": notes_string}}
 
                 token = json.dumps(reformatted_dictionary, indent=4)
                 
