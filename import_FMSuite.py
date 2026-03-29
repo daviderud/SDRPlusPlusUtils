@@ -96,10 +96,10 @@ def main():
         pass
 
     # Ask the user if they want to apply a frequency correction to the frequencies in the database
-    print("Note: In March 2026, classaxe import in Frequency Manager Suite (ver. 2.3.5) imports the frequencies in MHz rather than KHz.")
+    print("Note: In March 2026, classaxe and mwlist import in Frequency Manager Suite (ver. 2.3.5) imports the frequencies in MHz rather than KHz.")
     apply_correction = input("Do you want to apply a frequency correction to the frequencies? (y/n): ").lower() == 'y'  
     if apply_correction:
-        correction_value = float(input("Enter the frequency correction value in Hz (multiplication factor. For classaxe: 1e-3): "))
+        correction_value = float(input("Enter the frequency correction value in Hz (multiplication factor. For classaxe: 1e-3; for mwlist: 1e-6): "))
     else:
         correction_value = 1.0
 
