@@ -85,6 +85,24 @@ def main():
     if not output_json_filename.endswith(extension):
         output_json_filename += extension
 
+    # Ask confirmation to the user before proceeding if file exists
+    try:
+        with open(output_json_filename, 'r') as f:
+            overwrite = input(f"File {output_json_filename} already exists. Do you want to overwrite it? (y/n): ").lower() == 'y'
+            if not overwrite:
+                print("Cancelled.")
+                return
+    except FileNotFoundError:
+        pass
+
+    # Ask the user if they want to apply a frequency correction to the frequencies in the database
+    print("Note: In March 2026, classaxe import in Frequency Manager Suite (ver. 2.3.5) imports the frequencies in MHz rather than KHz.")
+    apply_correction = input("Do you want to apply a frequency correction to the frequencies? (y/n): ").lower() == 'y'  
+    if apply_correction:
+        correction_value = float(input("Enter the frequency correction value in Hz (multiplication factor. For classaxe: 1e-3): "))
+    else:
+        correction_value = 1.0
+
     # create a database connection
     conn = create_connection(database)
     with conn:
@@ -177,7 +195,7 @@ def main():
                 else:
                     notes_string = ""
 
-                reformatted_dictionary = {description_string: {"bandwidth": dictionary['Filter Bandwidth'],"frequency":dictionary['Frequency'],"mode":dictionary_modes[dictionary['Mode']], "geoinfo":geo_string, "startTime":startTime_num, "stopTime":stopTime_num, "days":days_array, "notes": notes_string}}
+                reformatted_dictionary = {description_string: {"bandwidth": dictionary['Filter Bandwidth'],"frequency":dictionary['Frequency'] * correction_value,"mode":dictionary_modes[dictionary['Mode']], "geoinfo":geo_string, "startTime":startTime_num, "stopTime":stopTime_num, "days":days_array, "notes": notes_string}}
 
                 token = json.dumps(reformatted_dictionary, indent=4)
                 
