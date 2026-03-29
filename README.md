@@ -4,9 +4,9 @@
  # import_FMSuite
 Tool to import in SDRPlusPlus (https://github.com/AlexandreRouma/SDRPlusPlus/) a database of the SDRSharp (https://airspy.com/download/) plugin *FMSuite* (https://www.freqmgrsuite.com/).
 
-The script is made to import bookmarks in the advanced bookmark manager by Darau Blé (https://github.com/darauble/bookmark_manager). However, it is compatible aswell with the standard SDR++ frequency manager module.
+The script is made to import bookmarks in the advanced bookmark manager by Darau Blé (https://github.com/darauble/bookmark_manager; included in my custom version of SDRPlusPlus https://github.com/daviderud/SDRPlusPlus). However, the import of the generated json file it is compatible aswell with the standard SDR++ frequency manager module.
 
-Tested version 2.0 with Python 3.10, SDRPlusPlus 1.1.0 and FMSuite 2.3. Bookmarks manager 0.1.7.
+Tested version 2.0 with Python 3.10 and 3.14, SDRPlusPlus 1.2.0 and FMSuite 2.3.5. Bookmarks manager 0.1.7.
 
 Run the script `import_FMSuite.py` with Python interpreter.
 
@@ -16,7 +16,11 @@ Then in SDRPlusPlus, in the bookmarks manager or frequency manager, select "Impo
 
  # Netherlands frequency band plan
  
-It's a work in progress. Merged into main (https://github.com/AlexandreRouma/SDRPlusPlus/blob/master/root/res/bandplans/netherlands.json).
+It's a work in progress. 
+
+Two version exists:
+1) A simplified one, merged into main (https://github.com/AlexandreRouma/SDRPlusPlus/blob/master/root/res/bandplans/netherlands.json).
+2) A more detailed one, included (together with the simplified one) in my custom version of SDRPlusPlus (https://github.com/daviderud/SDRPlusPlus).
 
 I use the following colors in the `root/config.json`:
 
